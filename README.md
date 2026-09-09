@@ -1,10 +1,14 @@
 # Rule Studio
 
+**Demo online:** [Abrir Rule Studio](https://inhouse-rule-manager-demo.manuelrodval.chatgpt.site/)
+
+El sitio es público: cualquier persona con el enlace puede acceder. Para utilizar un espacio de trabajo y guardar ediciones, la aplicación solicita iniciar sesión con ChatGPT.
+
 Rule Studio es un entorno para definir datos de entrada, construir variables reutilizables y crear reglas de evaluación mediante herramientas visuales, Python y SQL. La lógica se expresa en DSL JSON tipadas que pueden validarse, versionarse e interpretarse fuera de la interfaz.
 
 El repositorio incluye una aplicación web, una biblioteca Python y notebooks con datos sintéticos. La demo funciona en un único OpenAI Sites: ejecuta los motores en el navegador y conserva las ediciones en almacenamiento del sitio, sin un servicio FastAPI externo.
 
-[Demo alojada — acceso restringido](https://inhouse-rule-manager-demo.manuelrodval.chatgpt.site) · [Especificación DSL](docs/dsl/v0.1.md) · [Arquitectura de la demo](docs/demo-sites.md)
+[Especificación DSL](docs/dsl/v0.1.md) · [Arquitectura de la demo](docs/demo-sites.md)
 
 > Estado: MVP funcional para diseño y experimentación. Los perfiles de la demo son simulados; la integración con infraestructura productiva es una etapa posterior.
 
