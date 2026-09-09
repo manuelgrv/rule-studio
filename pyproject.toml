@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "inhouse-rule-manager"
+version = "0.1.0"
+description = "Typed JSON DSL compilers and local DuckDB banking demonstration"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "duckdb>=1.4,<2",
+  "faker>=37,<41",
+  "jsonschema>=4.23,<5",
+  "sqlglot>=28,<31",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "nbformat>=5.10,<6", "nbclient>=0.10,<1", "ipykernel>=6.29,<8"]
+
+[project.scripts]
+rule-manager-demo = "rule_manager.demo:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rule_manager"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

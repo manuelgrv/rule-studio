@@ -1,0 +1,407 @@
+specification {
+  color lakehouse #527C83
+  color people #887B68
+  color platformTone #69738A
+  color applicationTone #617C93
+  color processingTone #63816F
+  color controlTone #8A806C
+  color metadataTone #81758A
+  color externalTone #727981
+  element person {
+    notation 'Personas / roles'
+    style { shape person; color people }
+  }
+  element system {
+    notation 'Sistema externo'
+    style { icon bootstrap:building; shape rectangle; color externalTone }
+  }
+  element platform {
+    notation 'Plataforma Databricks / límite de aplicación'
+    technology 'Databricks — nube por definir'
+    style { icon azure:azure-databricks; shape rectangle; color platformTone }
+  }
+  element application {
+    notation 'Aplicación / interfaz de usuario'
+    style { icon bootstrap:window-desktop; shape browser; color applicationTone }
+  }
+  element process {
+    notation 'Procesamiento en Python'
+    technology 'Python'
+    style { icon tech:python; shape component; color processingTone }
+  }
+  element component {
+    notation 'Componente de edición / dominio'
+    style { icon bootstrap:diagram-3; shape component; color applicationTone }
+  }
+  element control {
+    notation 'Autorización / validación / orquestación'
+    style { icon bootstrap:gear; shape component; color controlTone }
+  }
+  element store {
+    notation 'Metadatos y flujos — tecnología por definir'
+    style { icon bootstrap:database; shape storage; color metadataTone }
+  }
+  element table {
+    notation 'Tabla del lakehouse'
+    technology 'Tabla del lakehouse'
+    style { icon bootstrap:table; shape cylinder; color lakehouse }
+  }
+  element library {
+    notation 'Biblioteca Python versionada'
+    technology 'Python'
+    style { icon tech:python; shape component; color metadataTone }
+  }
+  element artifact {
+    notation 'DSL y artefactos de ejecución versionados'
+    style { icon bootstrap:file-earmark-code; shape document; color metadataTone }
+  }
+}
+
+model {
+  artifactory = store 'Artifactory' {
+    technology 'JFrog Artifactory'
+    icon bootstrap:box-seam
+    description 'Repositorio de distribución de la biblioteca Python versionada. No ejecuta reglas ni almacena decisiones.'
+  }
+  analyst = person 'Creador de reglas' { description 'Permiso configurable para reglas y paquetes de producto; independiente del título laboral.' }
+  configurator = person 'Creador de inputs' { description 'Permiso configurable para fuentes, campos y uniones del módulo 1.' }
+  approver = person 'Aprobadores por tipo' { description 'Permisos de aprobación de inputs, variables y reglas. Sin autoaprobación; permiso específico para aprobar el paquete completo.' }
+  variableAuthor = person 'Creador de variables' { description 'Permiso para variables virtuales y catálogo, independiente del cargo.' }
+  orchestrator = control 'Orquestación productiva externa' { description 'Consume DSL publicado. Programación, ejecución y operación fuera de la UI; Lakeflow Jobs como destino.' }
+  sources = table 'Fuentes existentes del lakehouse' { description 'Tablas sintéticas del MVP. Relaciones uno a uno y uno a muchos a partir del cliente.' }
+
+  manager = platform 'Gestor interno de reglas' {
+    description 'Tres módulos en Databricks Apps y procesamiento Python en el lakehouse. Separación de procesos propuesta.'
+    app = application 'Aplicación Databricks' {
+      technology 'Databricks Apps'
+      icon azure:azure-databricks
+      description 'Dashboard operativo SPA con shadcn/ui. Roles, versiones personales y descarga de DSL.'
+      ui = application 'Interfaz web' { description 'Pantallas de datos, campos transformados, reglas, productos y revisión.' }
+      api = control 'Autorización del servidor' { icon bootstrap:shield-lock
+ description 'Identidad, validación de roles y solicitudes autorizadas.' }
+      dataset = component '1 · Selección de inputs' { icon bootstrap:database-gear
+ description 'DSL de inputs tipado por nodo. Uniones 1:N generan arrays de objetos; sin coincidencias: [].' }
+      transform = component '2 · Variables virtuales' { icon bootstrap:calculator
+ description 'Aritmética, variables encadenadas y operaciones sobre arrays del cliente. Catálogo con traza.' }
+      rules = component '3 · Estudio de reglas' { icon bootstrap:file-code
+ description 'Low-code y Python/SQL generan el DSL conjunto de variables y evaluaciones. Funciones Python con retorno booleano validado.' }
+      products = component 'Composición lógica de productos' { icon bootstrap:diagram-3
+ description 'AND/OR/NOT; paquete aprobado y una evaluación vigente por producto. La UI termina en publicación.' }
+      validation = control 'Validación de contratos' { icon bootstrap:shield-check
+ description 'Tipos, dependencias, fuentes permitidas y compatibilidad de definiciones.' }
+      release = control 'Revisión y publicación' { icon bootstrap:person-check
+ description 'Aprobación por permisos; publicación automática del paquete exacto. No inicia jobs productivos.' }
+      execution = control 'Adaptador de biblioteca' { description 'FastAPI invoca la biblioteca para compilar, validar y mostrar DSL. No controla lotes productivos.' }
+    }
+    workflow = store 'Lakebase · Edición y revisiones' { technology 'Databricks Lakebase / PostgreSQL'
+ description 'Inputs, variables, reglas y JSON editables. Acceso por roles y espacios personales; estados de experimentación, propuesto, publicado y rechazado.' }
+    registry = table 'prod · JSON aprobado' { description 'Tablas del lakehouse con DSL aprobado y versiones fijas de sus dependencias.' }
+    compiler = library 'Biblioteca de compilación e interpretación' {
+      description 'Paquete Python publicado en Artifactory. Compila Python/SQL a DSL, genera planes e interpreta DSL dentro del proceso que la utiliza.'
+      interpreter = component 'Intérprete DSL' { description 'Construye DSL desde input, variables y reglas mediante módulos internos. Separación de construcción y ejecución por diseñar.' }
+      frontend = component 'Python / SQL → DSL' { description 'Analiza sintaxis sin ejecutar el código; rechaza construcciones no admitidas.' }
+      backend = component 'DSL → plan de ejecución' { description 'Valida y traduce DSL de datos, transformaciones, reglas y productos.' }
+    }
+    artifacts = artifact 'Artefactos compilados' { description 'Planes versionados y metadatos del compilador. Almacenamiento por definir.' }
+    runtime = process 'Procesos de ejecución Python' {
+      description 'Procesos consumidores bajo control externo. Demo en notebook local; destino PySpark.'
+      ingest = process 'Materializador de datos' { description 'Ejecuta uniones declaradas, construye valores, estructuras y listas; valida cardinalidades.' }
+      transformed = process 'Motor de transformaciones' { description 'Calcula variables encadenadas y su traza. Sus valores se guardan en una tabla aparte al finalizar la evaluación.' }
+      engine = process 'Motor de reglas de producto' { description 'Lotes programados y experimentos bajo demanda. Las alternativas se expresan como reglas comunes.' }
+    }
+    input = table 'Tabla única de entrada consolidada' { description 'Input compartido entre productos. date: procesamiento; version: definición. Partición execution_id; forma semiestructurada configurable.' }
+    catalog = store 'Catálogo y estructura disponibles' { technology 'Lakebase — ubicación propuesta' description 'Snapshot de campos, rutas, tipos y dependencias en módulos 1, 2 y 3. Inconsistencias lógicas causan error de compilación.' }
+    ruleTrace = table 'prod · Reglas y resultados por cliente' { description 'Colección por cliente/ejecución: reglas, versiones y booleanos; null con diagnóstico ante error.' }
+    variableTrace = table 'prod · Variables calculadas y traza' { description 'Una fila por cliente/ejecución con colección de variables tipadas, versiones y traza.' }
+    experimental = table 'edv · Ejecuciones experimentales' { description 'Inputs y JSON experimentales; tres salidas: evaluaciones, variables materializadas y reglas/resultados por cliente.' }
+    results = table 'prod · Resultados por cliente y producto' { description 'Una fila por cliente/producto/ejecución. Booleano o null por error técnico; continúan los demás productos.' }
+  }
+
+  variableAuthor -> manager.app.transform 'Define variables y catálogo'
+  manager.runtime.ingest -> manager.registry 'Lee DSL de input publicado'
+  configurator -> manager.app.ui 'Configura datos de entrada'
+  analyst -> manager.app.ui 'Crea y experimenta'
+  approver -> manager.app.ui 'Aprueba publicación'
+  manager.app.ui -> manager.app.api 'Solicitudes autenticadas'
+  manager.app.api -> manager.app.dataset
+  manager.app.api -> manager.app.transform
+  manager.app.api -> manager.app.rules
+  manager.app.api -> manager.app.products
+  manager.app.api -> manager.app.release
+  manager.app.dataset -> manager.app.validation
+  manager.app.transform -> manager.app.validation
+  manager.app.rules -> manager.app.validation
+  manager.app.products -> manager.app.validation
+  manager.app.dataset -> manager.compiler 'Construye y valida DSL de inputs'
+  manager.app.transform -> manager.compiler 'Construye y valida variables'
+  manager.app.rules -> manager.compiler 'Compila low-code y Python/SQL mediante backend'
+  manager.app.dataset -> manager.workflow 'Guarda definiciones'
+  manager.app.transform -> manager.workflow 'Guarda transformaciones'
+  manager.app.rules -> manager.workflow 'Guarda reglas'
+  manager.app.products -> manager.workflow 'Guarda composiciones'
+  manager.app.release -> manager.workflow 'Lee revisión exacta y registra aprobación'
+  manager.app.release -> manager.app.validation 'Valida versión publicable'
+  manager.app.release -> manager.registry 'Publica automáticamente el DSL aprobado'
+  manager.app.release -> manager.app.execution 'Valida paquete antes de publicar'
+  manager.app.dataset -> manager.app.execution 'Construye y valida DSL de inputs'
+  manager.app.rules -> manager.app.execution 'Solicita compilación de código a DSL'
+  manager.app.products -> manager.app.execution 'Valida paquete de evaluación'
+  manager.app.execution -> manager.compiler.frontend 'Traduce código admitido'
+  manager.app.execution -> manager.workflow 'Guarda DSL común y diagnósticos de la biblioteca'
+  manager.app.execution -> manager.compiler.backend 'Compila definición o versión publicada'
+  manager.runtime -> manager.registry 'Lee DSL aprobado para compilar con la biblioteca'
+  manager.runtime -> manager.artifacts 'Guarda plan generado por la biblioteca'
+  orchestrator -> manager.registry 'Lee DSL vigente y fija versiones'
+  orchestrator -> manager.runtime.engine 'Inicia evaluación programada'
+  manager.runtime -> manager.artifacts 'Lee plan de ejecución fijado'
+  manager.runtime.ingest -> sources 'Lee campos y uniones declarados'
+  manager.runtime.ingest -> manager.input 'Materializa partición de ejecución'
+  manager.runtime.transformed -> manager.input 'Lee ejecución de entrada seleccionada'
+  manager.runtime.engine -> manager.runtime.transformed 'Solicita valores transformados declarados'
+  manager.runtime.engine -> manager.input 'Lee ejecución de entrada seleccionada'
+  manager.runtime -> manager.compiler 'Invoca compilador e intérprete instalados'
+  manager.app -> artifactory 'Instala versión fijada al desplegar'
+  manager.runtime -> artifactory 'Instala versión fijada al preparar el entorno'
+  manager.compiler -> artifactory 'Se publica como paquete versionado'
+  manager.runtime.engine -> manager.results 'Guarda resultados sin duplicar'
+  manager.runtime -> manager.workflow 'Registra estado y trazabilidad'
+  manager.app.products -> manager.results 'Consulta resultados productivos autorizados'
+  manager.app.validation -> manager.catalog 'Verifica catálogo y estructura'
+  manager.app.transform -> manager.catalog 'Consulta variables y dependencias'
+  manager.runtime.engine -> manager.ruleTrace 'Guarda reglas y resultados por cliente'
+  manager.runtime.engine -> manager.variableTrace 'Guarda valores al finalizar evaluación aprobada'
+  manager.runtime -> manager.experimental 'Ejecuta y conserva experimentos en edv'
+  manager.app.products -> manager.experimental 'Consulta resultados experimentales'
+  configurator -> manager.app.dataset 'Configura fuentes y relaciones'
+  analyst -> manager.app.rules 'Define y prueba reglas'
+  analyst -> manager.app.products 'Compone y experimenta'
+  approver -> manager.app.release 'Aprueba versión solicitada'
+  manager.app.transform -> manager.app.execution 'Solicita validación y vista previa de DSL'
+  manager.app.dataset -> manager.app.release 'Propone versión única de input productivo'
+  manager.app.rules -> manager.app.products 'Compone productos solo con lógica booleana'
+  manager.app.products -> manager.app.release 'Solicita publicación'
+  manager.app.transform -> manager.workflow 'Lee contrato de variables del módulo 1'
+  manager.app.rules -> manager.workflow 'Lee variables y transformaciones versionadas'
+  manager.runtime.ingest -> manager.compiler 'Compila DSL de consolidación'
+  manager.runtime.transformed -> manager.compiler 'Interpreta o compila transformaciones'
+  manager.runtime.engine -> manager.compiler 'Compila o interpreta criterios de producto'
+  manager.app.execution -> manager.compiler.interpreter 'Construye JSON y valida ejemplos'
+  manager.runtime.engine -> manager.registry 'Lee criterios publicados y dependencias'
+  manager.app.execution -> artifactory 'Instala biblioteca al preparar el entorno'
+}
+
+views {
+  view index {
+    title '01 · Contexto del sistema'
+    description 'Alcance: desde inputs hasta tres salidas productivas: evaluaciones cliente/producto, variables materializadas y reglas/resultados por cliente.'
+    group 'Usuarios' {
+      include analyst, configurator, variableAuthor, approver
+    }
+    group 'Entrada · Lakehouse' {
+      include sources
+    }
+    group 'Gestor · Autoría y publicación' { include manager.app, manager.registry }
+    group 'Consumo del DSL · Control externo' { include orchestrator, manager.runtime }
+    group 'Salidas · Databricks Lakehouse' {
+      include manager.variableTrace, manager.ruleTrace
+      include manager.results with {
+        title 'Resultados por cliente y producto'
+        description 'Cliente · Producto · Decisión final · Detalles de evaluación. Trazabilidad propuesta: reglas, motivos, versiones y ejecución.'
+        size large
+      }
+    }
+    exclude manager
+    exclude * -> *
+    include analyst -> manager.app
+    include variableAuthor -> manager.app
+    include manager.app -> manager.registry
+    include orchestrator -> manager.registry
+    include orchestrator -> manager.runtime
+    include configurator -> manager.app
+    include approver -> manager.app
+    include manager.runtime -> sources
+    include manager.runtime -> manager.variableTrace
+    include manager.runtime -> manager.ruleTrace
+    include manager.runtime -> manager.results
+    autoLayout LeftRight
+  }
+  view module_1 of manager.app.dataset {
+    title '02 · Módulo 1 — Selección de inputs'
+    description 'Autoría y publicación de input. La materialización es consumo externo del DSL; demo local en notebook.'
+    group 'Responsables' { include configurator, approver }
+    group 'Databricks Apps · Configuración' {
+      color applicationTone
+      include manager.app.dataset, manager.app.validation, manager.app.execution, manager.app.release
+    }
+    group 'Databricks Lakebase · Definiciones' { include manager.workflow, manager.catalog }
+    group 'Databricks · Procesamiento Python' { include manager.runtime.ingest }
+    group 'Biblioteca Python · Distribución en Artifactory' { include manager.compiler, artifactory }
+    group 'Databricks Lakehouse · Input en prod / edv' { include sources, manager.input }
+    exclude manager, manager.app, manager.runtime
+    exclude * -> *
+    include approver -> manager.app.release
+    include configurator -> manager.app.dataset
+    include manager.app.dataset -> manager.app.validation
+    include manager.app.validation -> manager.catalog
+    include manager.app.dataset -> manager.compiler
+    include manager.app.dataset -> manager.workflow
+    include manager.app.dataset -> manager.app.release
+    include manager.app.dataset -> manager.app.execution
+    include manager.runtime.ingest -> manager.compiler
+    include manager.compiler -> artifactory
+    include manager.runtime.ingest -> sources
+    include manager.runtime.ingest -> manager.input
+    autoLayout TopBottom
+  }
+  view module_2 of manager.app.transform {
+    title '03 · Módulo 2 — Variables virtuales'
+    description 'Permiso de variables, arrays y dependencias. Autoría virtual; valores materializados al ejecutar fuera de la UI.'
+    group 'Responsable' { include variableAuthor }
+    group 'Databricks Apps · Editor de transformaciones' {
+      color applicationTone
+      include manager.app.transform, manager.app.validation, manager.app.execution
+    }
+    group 'Databricks Lakebase · Catálogo de variables' { include manager.workflow, manager.catalog }
+    group 'Databricks · Procesamiento Python' { include manager.runtime.transformed }
+    group 'Biblioteca Python · Distribución en Artifactory' { include manager.compiler, artifactory }
+    group 'Databricks Lakehouse · Input y traza por entorno' { include manager.input, manager.variableTrace }
+    exclude manager, manager.app, manager.runtime
+    exclude * -> *
+    include variableAuthor -> manager.app.transform
+    include manager.app.transform -> manager.compiler
+    include manager.app.transform -> manager.workflow
+    include manager.app.transform -> manager.app.validation
+    include manager.app.validation -> manager.catalog
+    include manager.app.transform -> manager.app.execution
+    include manager.runtime.transformed -> manager.compiler
+    include manager.compiler -> artifactory
+    include manager.runtime.transformed -> manager.input
+    autoLayout TopBottom
+  }
+  view module_3 of manager.app.rules {
+    title '04 · Módulo 3 — Estudio de reglas'
+    description 'Composición, experimentación, aprobación independiente y publicación automática. Ejecución por lotes con salida productiva por cliente y producto.'
+    group 'Responsables' { include analyst, approver }
+    group 'Databricks Apps · Experimentar y publicar' {
+      color applicationTone
+      include manager.app.rules, manager.app.products, manager.app.release
+    }
+    group 'Databricks Lakebase · Revisiones' { include manager.workflow, manager.catalog }
+    group 'Databricks · Ejecución Python' { include orchestrator, manager.runtime.engine }
+    group 'Biblioteca Python · Distribución en Artifactory' { include manager.compiler, artifactory }
+    group 'Databricks Lakehouse · Criterios, entrada y resultados' {
+      include manager.registry, manager.input, manager.results, manager.variableTrace, manager.ruleTrace
+    }
+    exclude manager, manager.app, manager.runtime
+    exclude * -> *
+    include manager.app.rules -> manager.compiler
+    include analyst -> manager.app.rules
+    include manager.app.rules -> manager.app.products
+    include approver -> manager.app.release
+    include manager.app.products -> manager.app.release
+    include manager.app.release -> manager.workflow
+    include manager.app.release -> manager.registry
+    include orchestrator -> manager.runtime.engine
+    include manager.runtime.engine -> manager.compiler
+    include manager.compiler -> artifactory
+    include manager.runtime.engine -> manager.input
+    include manager.runtime.engine -> manager.ruleTrace
+    include manager.runtime.engine -> manager.results
+    include manager.runtime.engine -> manager.variableTrace
+    include manager.runtime.engine -> manager.registry
+    autoLayout TopBottom
+  }
+}
+
+views {
+  view global_architecture {
+    title '00 · Arquitectura global — vista agrupada'
+    description 'Arquitectura destino. UI hasta publicación; consumo productivo bajo control externo. Ver demo_local para la entrega sin dependencias bancarias.'
+    group 'Databricks Apps · Crear y aprobar' {
+      color applicationTone
+      include manager.app with {
+        navigateTo module_1
+        description 'SPA shadcn/ui: 1. Inputs · 2. Variables virtuales · 3. Estudio de reglas y productos. JSON descargable y aprobación.'
+      }
+      include manager.workflow
+    }
+    group 'Databricks Lakehouse · DSL publicado' {
+      color metadataTone
+      include manager.registry
+    }
+    group 'Planes generados · Almacenamiento por definir' {
+      include manager.artifacts
+    }
+    group 'Biblioteca Python · JFrog Artifactory' {
+      color metadataTone
+      include manager.compiler, artifactory
+    }
+    group 'Control externo · Consumo productivo' {
+      color processingTone
+      include orchestrator, manager.runtime
+    }
+    group 'Databricks Lakehouse · prod · Ejecuciones aprobadas' {
+      color lakehouse
+      include sources, manager.input, manager.results, manager.variableTrace, manager.ruleTrace
+    }
+    group 'Databricks Lakehouse · edv · Experimentación' {
+      color lakehouse
+      include manager.experimental
+    }
+    exclude manager
+    exclude * -> *
+    include manager.app -> manager.compiler
+    include manager.app -> manager.workflow
+    include manager.app -> manager.registry
+    include manager.compiler -> artifactory
+    include manager.runtime -> manager.compiler
+    include manager.runtime -> manager.registry
+    include manager.runtime -> manager.artifacts
+    include orchestrator -> manager.runtime
+    include manager.runtime -> sources
+    include manager.runtime -> manager.input
+    include manager.runtime -> manager.ruleTrace
+    include manager.runtime -> manager.results
+    include manager.runtime -> manager.variableTrace
+    include manager.runtime -> manager.experimental
+    autoLayout LeftRight
+  }
+}
+
+model {
+  demo = system 'Demo local independiente' {
+    technology 'Herramientas locales'
+    web = application 'UI local · Tres módulos' { technology 'React / Vite / shadcn/ui' description 'Autoría visual, Python y SQL; visor JSON, descarga y publicación.' }
+    api = process 'API local' { technology 'FastAPI' description 'Permisos, versiones y acceso a la biblioteca compartida.' }
+    storage = store 'Ediciones y DSL publicados' { technology 'Almacenamiento local' description 'Versiones privadas y paquetes publicados; sin acceso a Lakebase.' }
+    notebook = process 'Notebook y tests sintéticos' { technology 'Python / Jupyter' description 'Importan la misma biblioteca. Consolidación, evaluación y errores parciales.' }
+    sources = table 'Fuentes sintéticas locales' { technology 'Datos locales' description '30 mil clientes; cuentas y relaciones 1:N.' }
+    outputs = table 'Input y tres salidas locales' { technology 'Datasets locales' description 'Input consolidado, evaluaciones, variables y reglas/resultados.' }
+  }
+  demo.web -> demo.api 'Solicita compilación y publicación'
+  demo.api -> manager.compiler 'Usa biblioteca común'
+  demo.api -> demo.storage 'Guarda versiones y publica DSL'
+  demo.notebook -> manager.compiler 'Usa la misma biblioteca'
+  demo.notebook -> demo.storage 'Carga DSL publicado'
+  demo.notebook -> demo.sources 'Lee datos sintéticos'
+  demo.notebook -> demo.outputs 'Materializa y evalúa'
+}
+views {
+  view demo_local {
+    title '05 · Demo local — UI, biblioteca y notebook'
+    description 'Objetivo de demo local. Biblioteca, DuckDB y notebooks implementados; UI/FastAPI en etapa posterior. Sin conexiones a la plataforma bancaria.'
+    group 'Autoría y publicación local' { include demo.web, demo.api, demo.storage }
+    group 'Núcleo compartido' { include manager.compiler with { description 'Paquete Python local: constructores DSL, Python/SQL y ejecución. Artifactory en integración futura.' } }
+    group 'Demostración y pruebas' { include demo.notebook, demo.sources, demo.outputs }
+    exclude demo, manager
+    exclude * -> *
+    include demo.web -> demo.api
+    include demo.api -> manager.compiler
+    include demo.api -> demo.storage
+    include demo.notebook -> manager.compiler
+    include demo.notebook -> demo.storage
+    include demo.notebook -> demo.sources
+    include demo.notebook -> demo.outputs
+    autoLayout TopBottom
+  }
+}

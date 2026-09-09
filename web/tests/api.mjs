@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+const base='http://localhost:3000/api/workspace';
+const headers={'Cookie':'__sites_local_auth=1','Origin':'http://localhost:3000','Content-Type':'application/json'};
+assert.equal((await fetch(base)).status,401);
+let r=await fetch(base,{method:'POST',headers,body:JSON.stringify({action:'initialize'})});assert.equal(r.status,200);const initial=await r.json();assert.ok(initial.state.inputs.output_schema);
+r=await fetch(base,{method:'POST',headers,body:JSON.stringify({action:'save',kind:'inputs',persona:'specialist',revision:initial.revision,document:initial.state.inputs})});assert.equal(r.status,400);
+r=await fetch(base,{method:'POST',headers:{...headers,Origin:'https://untrusted.invalid'},body:'{}'});assert.equal(r.status,403);
+r=await fetch(base,{method:'POST',headers,body:JSON.stringify({action:'save',kind:'inputs',persona:'policy',revision:-1,document:initial.state.inputs})});assert.equal(r.status,409);
+r=await fetch(base,{headers});const restored=await r.json();assert.deepEqual(restored,initial);
+console.log('PASS: authentication, persistence reload, author permission, CSRF and revision conflict.');

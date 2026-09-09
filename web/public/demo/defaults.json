@@ -1,0 +1,848 @@
+{
+  "inputs": {
+    "kind": "consolidated_inputs",
+    "dsl_version": "0.1",
+    "definition_id": "banking_inputs",
+    "definition_version": 1,
+    "created_by": "synthetic-author",
+    "created_at": "2026-09-09T00:00:00Z",
+    "root": {
+      "source": "c",
+      "client_key": "client_id"
+    },
+    "sources": [
+      {
+        "id": "c",
+        "table_ref": "clients",
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "name": {
+            "type": "string",
+            "nullable": false
+          },
+          "age": {
+            "type": "integer",
+            "nullable": false
+          },
+          "spouse_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      {
+        "id": "f",
+        "table_ref": "finances",
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "income": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "debt": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "sp",
+        "table_ref": "clients",
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "name": {
+            "type": "string",
+            "nullable": false
+          },
+          "age": {
+            "type": "integer",
+            "nullable": false
+          },
+          "spouse_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      {
+        "id": "sf",
+        "table_ref": "finances",
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "income": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "debt": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "a",
+        "table_ref": "accounts",
+        "fields": {
+          "account_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "balance": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "kind": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "m",
+        "table_ref": "movements",
+        "fields": {
+          "movement_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "account_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "amount": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "movement_date": {
+            "type": "date",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "l",
+        "table_ref": "loans",
+        "fields": {
+          "loan_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "outstanding": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          }
+        }
+      }
+    ],
+    "joins": [
+      {
+        "id": "financial",
+        "parent": "c",
+        "source": "f",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "one",
+        "order_by": [
+          "client_id"
+        ]
+      },
+      {
+        "id": "spouse",
+        "parent": "c",
+        "source": "sp",
+        "left_key": "spouse_id",
+        "right_key": "client_id",
+        "cardinality": "one",
+        "order_by": [
+          "client_id"
+        ]
+      },
+      {
+        "id": "spouse_financial",
+        "parent": "sp",
+        "source": "sf",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "one",
+        "order_by": [
+          "client_id"
+        ]
+      },
+      {
+        "id": "accounts",
+        "parent": "c",
+        "source": "a",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "many",
+        "order_by": [
+          "account_id"
+        ]
+      },
+      {
+        "id": "movements",
+        "parent": "a",
+        "source": "m",
+        "left_key": "account_id",
+        "right_key": "account_id",
+        "cardinality": "many",
+        "order_by": [
+          "movement_id"
+        ]
+      },
+      {
+        "id": "loans",
+        "parent": "c",
+        "source": "l",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "many",
+        "order_by": [
+          "loan_id"
+        ]
+      }
+    ],
+    "output_schema": {
+      "type": "struct",
+      "nullable": false,
+      "fields": {
+        "name": {
+          "type": "string",
+          "nullable": false
+        },
+        "age": {
+          "type": "integer",
+          "nullable": false
+        },
+        "financial": {
+          "type": "struct",
+          "nullable": true,
+          "fields": {
+            "income": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            },
+            "debt": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            }
+          }
+        },
+        "spouse": {
+          "type": "struct",
+          "nullable": true,
+          "fields": {
+            "name": {
+              "type": "string",
+              "nullable": false
+            },
+            "financial": {
+              "type": "struct",
+              "nullable": true,
+              "fields": {
+                "income": {
+                  "type": "decimal",
+                  "precision": 18,
+                  "scale": 2,
+                  "nullable": false
+                }
+              }
+            }
+          }
+        },
+        "accounts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "struct",
+            "nullable": false,
+            "fields": {
+              "id": {
+                "type": "string",
+                "nullable": false
+              },
+              "balance": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "kind": {
+                "type": "string",
+                "nullable": false
+              },
+              "movements": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "struct",
+                  "nullable": false,
+                  "fields": {
+                    "id": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "amount": {
+                      "type": "decimal",
+                      "precision": 18,
+                      "scale": 2,
+                      "nullable": false
+                    },
+                    "date": {
+                      "type": "date",
+                      "nullable": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "loans": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "struct",
+            "nullable": false,
+            "fields": {
+              "id": {
+                "type": "string",
+                "nullable": false
+              },
+              "outstanding": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "mappings": {
+      "name": {
+        "ref": {
+          "source": "c",
+          "field": "name"
+        }
+      },
+      "age": {
+        "ref": {
+          "source": "c",
+          "field": "age"
+        }
+      },
+      "financial": {
+        "join": "financial",
+        "object": {
+          "income": {
+            "ref": {
+              "source": "f",
+              "field": "income"
+            }
+          },
+          "debt": {
+            "ref": {
+              "source": "f",
+              "field": "debt"
+            }
+          }
+        }
+      },
+      "spouse": {
+        "join": "spouse",
+        "object": {
+          "name": {
+            "ref": {
+              "source": "sp",
+              "field": "name"
+            }
+          },
+          "financial": {
+            "join": "spouse_financial",
+            "object": {
+              "income": {
+                "ref": {
+                  "source": "sf",
+                  "field": "income"
+                }
+              }
+            }
+          }
+        }
+      },
+      "accounts": {
+        "join": "accounts",
+        "array": {
+          "id": {
+            "ref": {
+              "source": "a",
+              "field": "account_id"
+            }
+          },
+          "balance": {
+            "ref": {
+              "source": "a",
+              "field": "balance"
+            }
+          },
+          "kind": {
+            "ref": {
+              "source": "a",
+              "field": "kind"
+            }
+          },
+          "movements": {
+            "join": "movements",
+            "array": {
+              "id": {
+                "ref": {
+                  "source": "m",
+                  "field": "movement_id"
+                }
+              },
+              "amount": {
+                "ref": {
+                  "source": "m",
+                  "field": "amount"
+                }
+              },
+              "date": {
+                "ref": {
+                  "source": "m",
+                  "field": "movement_date"
+                }
+              }
+            }
+          }
+        }
+      },
+      "loans": {
+        "join": "loans",
+        "array": {
+          "id": {
+            "ref": {
+              "source": "l",
+              "field": "loan_id"
+            }
+          },
+          "outstanding": {
+            "ref": {
+              "source": "l",
+              "field": "outstanding"
+            }
+          }
+        }
+      }
+    }
+  },
+  "evaluations": {
+    "kind": "evaluations",
+    "dsl_version": "0.1",
+    "definition_id": "banking_evaluation",
+    "definition_version": 1,
+    "created_by": "synthetic-author",
+    "created_at": "2026-09-09T00:00:00Z",
+    "input_contract": {
+      "definition_id": "banking_inputs",
+      "definition_version": 1,
+      "schema_hash": "a7d913e29d555a574bbe2f2176ac2eb5c5075829a5feebda5a3df35769c46e49"
+    },
+    "constants": {
+      "minimum_age": {
+        "value": 18,
+        "data_type": {
+          "type": "integer",
+          "nullable": false
+        }
+      },
+      "zero_money": {
+        "value": "0.00",
+        "data_type": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        }
+      }
+    },
+    "variables": [
+      {
+        "id": "income",
+        "version": 1,
+        "data_type": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "expression": {
+          "op": "coalesce",
+          "args": [
+            {
+              "ref": {
+                "scope": "input",
+                "path": [
+                  "financial",
+                  "income"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "constant",
+                "path": [
+                  "zero_money"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "debt",
+        "version": 1,
+        "data_type": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "expression": {
+          "op": "coalesce",
+          "args": [
+            {
+              "ref": {
+                "scope": "input",
+                "path": [
+                  "financial",
+                  "debt"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "constant",
+                "path": [
+                  "zero_money"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "debt_ratio",
+        "version": 1,
+        "data_type": {
+          "type": "decimal",
+          "precision": 28,
+          "scale": 6,
+          "nullable": false
+        },
+        "expression": {
+          "op": "div",
+          "args": [
+            {
+              "ref": {
+                "scope": "variable",
+                "path": [
+                  "debt"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "variable",
+                "path": [
+                  "income"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "total_balance",
+        "version": 1,
+        "data_type": {
+          "type": "decimal",
+          "precision": 28,
+          "scale": 6,
+          "nullable": false
+        },
+        "expression": {
+          "op": "sum",
+          "args": [
+            {
+              "ref": {
+                "scope": "input",
+                "path": [
+                  "accounts"
+                ]
+              }
+            }
+          ],
+          "path": [
+            "balance"
+          ]
+        }
+      },
+      {
+        "id": "account_count",
+        "version": 1,
+        "data_type": {
+          "type": "integer",
+          "nullable": false
+        },
+        "expression": {
+          "op": "count",
+          "args": [
+            {
+              "ref": {
+                "scope": "input",
+                "path": [
+                  "accounts"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "rules": [
+      {
+        "id": "adult",
+        "version": 1,
+        "data_type": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "expression": {
+          "op": "gte",
+          "args": [
+            {
+              "ref": {
+                "scope": "input",
+                "path": [
+                  "age"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "constant",
+                "path": [
+                  "minimum_age"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "affordability",
+        "version": 1,
+        "data_type": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "expression": {
+          "op": "lt",
+          "args": [
+            {
+              "ref": {
+                "scope": "variable",
+                "path": [
+                  "debt_ratio"
+                ]
+              }
+            },
+            {
+              "literal": {
+                "value": "1.0",
+                "data_type": {
+                  "type": "decimal",
+                  "precision": 28,
+                  "scale": 6,
+                  "nullable": false
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "has_accounts",
+        "version": 1,
+        "data_type": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "expression": {
+          "op": "gt",
+          "args": [
+            {
+              "ref": {
+                "scope": "variable",
+                "path": [
+                  "account_count"
+                ]
+              }
+            },
+            {
+              "literal": {
+                "value": 0,
+                "data_type": {
+                  "type": "integer",
+                  "nullable": false
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "non_negative_balance",
+        "version": 1,
+        "data_type": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "expression": {
+          "op": "gte",
+          "args": [
+            {
+              "ref": {
+                "scope": "variable",
+                "path": [
+                  "total_balance"
+                ]
+              }
+            },
+            {
+              "literal": {
+                "value": 0,
+                "data_type": {
+                  "type": "integer",
+                  "nullable": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "products": [
+      {
+        "id": "basic_account",
+        "version": 1,
+        "expression": {
+          "ref": {
+            "scope": "rule",
+            "path": [
+              "adult"
+            ]
+          }
+        }
+      },
+      {
+        "id": "demo_credit",
+        "version": 1,
+        "expression": {
+          "op": "and",
+          "args": [
+            {
+              "ref": {
+                "scope": "rule",
+                "path": [
+                  "adult"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "rule",
+                "path": [
+                  "affordability"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "savings_offer",
+        "version": 1,
+        "expression": {
+          "op": "and",
+          "args": [
+            {
+              "ref": {
+                "scope": "rule",
+                "path": [
+                  "adult"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "rule",
+                "path": [
+                  "has_accounts"
+                ]
+              }
+            },
+            {
+              "ref": {
+                "scope": "rule",
+                "path": [
+                  "non_negative_balance"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

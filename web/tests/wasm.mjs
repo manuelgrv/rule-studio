@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { loadPyodide } from 'pyodide';
+process.on('uncaughtException',e=>{console.error(e.message);process.exit(1)});
+const require=createRequire(import.meta.url);
+const duck=require('@duckdb/duckdb-wasm/blocking');
+const dist=new URL('../node_modules/@duckdb/duckdb-wasm/dist/',import.meta.url).pathname;
+const db=await duck.createDuckDB({mvp:{mainModule:dist+'duckdb-mvp.wasm'},eh:{mainModule:dist+'duckdb-eh.wasm'}},new duck.VoidLogger(),duck.NODE_RUNTIME);
+await db.instantiate();
+const con=db.connect();
+for(const t of ['clients','finances','accounts','movements','loans']){db.registerFileBuffer(t+'.parquet',readFileSync(new URL(`../public/demo/${t}.parquet`,import.meta.url)));con.query(`CREATE TABLE ${t} AS SELECT * FROM '${t}.parquet'`)}
+console.log('DuckDB-WASM: five source tables loaded.');
+const py=await loadPyodide({packageBaseUrl:'https://cdn.jsdelivr.net/pyodide/v0.29.3/full/'});
+await py.loadPackage(['micropip','jsonschema']);
+await py.runPythonAsync('import micropip\nawait micropip.install("sqlglot==30.18.0")');
+py.unpackArchive(new Uint8Array(readFileSync(new URL('../public/demo/rule_manager.zip',import.meta.url))),'zip');
+py.runPython(readFileSync(new URL('../python/bridge.py',import.meta.url),'utf8'));
+const defaults=JSON.parse(readFileSync(new URL('../public/demo/defaults.json',import.meta.url),'utf8'));
+const fn=py.globals.get('call');
+const call=(action,extra={})=>{const r=JSON.parse(fn(JSON.stringify({...defaults,catalog:defaults.inputs.sources,action,...extra})));if(!r.ok)throw new Error(JSON.stringify(r.error));return r.result};
+const plan=call('validate');
+con.query(`CREATE TABLE consolidated_input AS ${plan.sql}`);
+assert.equal(Number(con.query('SELECT count(*) n FROM consolidated_input').toArray()[0].n),30000);
+const visual=call('rule',{language:'visual',source:defaults.evaluations.rules[0].expression});
+const python=call('rule',{language:'python',source:'def regla(inputs, variables, constants) -> bool:\n    return inputs["age"] >= constants["minimum_age"]'});
+const sql=call('rule',{language:'sql',source:'inputs.age >= constants.minimum_age'});
+assert.deepEqual(visual.expression,python.expression);assert.deepEqual(sql.expression,python.expression);
+assert.throws(()=>call('rule',{language:'python',source:'import os\ndef regla(inputs) -> bool:\n    return True'}));
+assert.throws(()=>call('rule',{language:'python',source:'def regla(inputs) -> bool:\n    return 10'}));
+const bad=structuredClone(defaults.inputs);bad.sources[0].fields.age={type:'string',nullable:false};
+assert.throws(()=>call('inputs',{inputs:bad}),/CATALOG_DRIFT/);
+const selected=con.query('SELECT CAST(to_json(t) AS VARCHAR) AS row FROM (SELECT client,fields FROM consolidated_input ORDER BY client) t').toArray();
+const totals={};
+for(let i=0;i<selected.length;i+=500){const traces=call('evaluate',{rows:`[${selected.slice(i,i+500).map(r=>r.row).join(',')}]`});for(const t of traces)for(const p of t.products){totals[p.id]||={accepted:0,denied:0,errors:0};totals[p.id][p.value===null?'errors':p.value?'accepted':'denied']++}}
+assert.deepEqual(totals,{basic_account:{accepted:30000,denied:0,errors:0},demo_credit:{accepted:14964,denied:15005,errors:31},savings_offer:{accepted:22494,denied:7506,errors:0}});
+console.log('PASS: 30,000 consolidated clients; Python/SQL/visual parity; invalid types/imports/returns rejected; 90,000 decisions match native engine.',totals);
+fn.destroy();con.close();
