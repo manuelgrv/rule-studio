@@ -410,3 +410,11 @@ button:disabled {
     @apply font-sans;
   }
 }
+
+.field-catalog { max-height: 640px; overflow-y: auto; overscroll-behavior: contain; }
+.field-table { border: 1px solid #dce4ec; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.field-table-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; background: #f0f4f8; font-size: 14px; }
+.field-option { display: flex; align-items: center; gap: 12px; padding: 12px; border-top: 1px solid #e9edf2; cursor: pointer; font-size: 14px; }
+.field-option:hover { background: #f7f9fc; }
+.field-option:has([data-state="checked"]) { background: #f0f6fb; }
+@media (prefers-reduced-motion: reduce) { [data-slot="sidebar-container"], [data-slot="sidebar-gap"] { transition: none; } }

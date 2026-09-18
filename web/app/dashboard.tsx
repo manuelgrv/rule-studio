@@ -64,6 +64,7 @@ import {
 } from '@/lib/runtime';
 import { personas, type Workspace } from '@/lib/workflow';
 import { registerNavigation } from '@/lib/webmcp';
+import { InputFieldSelector } from '@/components/input-field-selector';
 
 const modules = [
   'Resumen operativo',
@@ -472,6 +473,10 @@ function download(name: string, value: unknown) {
 }
 
 export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  useEffect(() => {
+    setSidebarOpen(!document.cookie.split('; ').includes('sidebar_state=false'));
+  }, []);
   const [active, setActive] = useState(0),
     [persona, setPersona] = useState('policy');
   useEffect(() => registerNavigation(setActive), []);
@@ -549,15 +554,13 @@ export default function Dashboard() {
     setError('');
     try {
       const d = (await fetch('/demo/defaults.json').then((r) => r.json())) as Doc;
+      const catalogResponse = await fetch('/demo/input-catalog.json');
+      if (!catalogResponse.ok) throw new Error('No se pudo cargar el catálogo de campos.');
+      d.inputCatalog = await catalogResponse.json();
       setDefaults(d);
       const r = await fetch('/api/workspace');
       const s = (await r.json()) as Doc;
-      if (!r.ok)
-        throw new Error(
-          r.status === 401
-            ? 'Inicia sesión con ChatGPT para abrir tu espacio.'
-            : s.error,
-        );
+      if (!r.ok) throw new Error(s.error || 'No se pudo abrir el espacio. Inténtalo de nuevo.');
       accept(s.state ? s : await request({ action: 'initialize' }));
     } catch (e) {
       setError(String(e));
@@ -688,17 +691,17 @@ export default function Dashboard() {
     </div>
   );
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader className="px-6 py-8">
-          <div className="mb-3 flex items-center gap-3">
-            <Layers size={27} />
-            <span className="text-xs tracking-[.2em] opacity-70">
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <Sidebar collapsible="icon">
+        <SidebarHeader className="px-6 py-8 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-6">
+          <div className="mb-3 flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
+            <Layers size={27} className="shrink-0" aria-label="Rule Studio" />
+            <span className="text-xs tracking-[.2em] opacity-70 group-data-[collapsible=icon]:hidden">
               ESPACIO DE REGLAS
             </span>
           </div>
-          <strong className="text-xl">Rule Studio</strong>
-          <span className="text-sm opacity-65">Diseño y evaluación</span>
+          <strong className="text-xl group-data-[collapsible=icon]:hidden">Rule Studio</strong>
+          <span className="text-sm opacity-65 group-data-[collapsible=icon]:hidden">Diseño y evaluación</span>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -710,6 +713,8 @@ export default function Dashboard() {
                   <SidebarMenuItem key={name}>
                     <SidebarMenuButton
                       size="lg"
+                      tooltip={name}
+                      aria-label={name}
                       isActive={active === i}
                       onClick={() => setActive(i)}
                     >
@@ -722,7 +727,7 @@ export default function Dashboard() {
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="p-6">
+        <SidebarFooter className="p-6 group-data-[collapsible=icon]:hidden">
           <div className="rounded-lg border border-white/15 p-3 text-sm">
             <span className="block font-medium">Demo sintética</span>
             <span className="mt-1 block opacity-65">
@@ -731,10 +736,10 @@ export default function Dashboard() {
           </div>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <header className="topbar">
           <div className="flex items-center gap-3">
-            <SidebarTrigger />
+            <SidebarTrigger aria-label={sidebarOpen ? "Contraer menú" : "Expandir menú"} title={sidebarOpen ? "Contraer menú (⌘/Ctrl+B)" : "Expandir menú (⌘/Ctrl+B)"} className="size-10 border border-border" />
             <span className="text-sm text-muted-foreground">
               Mi espacio <ChevronRight className="inline" size={14} /> Rule Studio
             </span>
@@ -791,13 +796,6 @@ export default function Dashboard() {
               {error && (
                 <div className="mt-4 flex gap-3">
                   <Button onClick={load}>Reintentar</Button>
-                  <a
-                    className="text-primary underline"
-                    href="/signin-with-chatgpt?return_to=%2F"
-                    target="_top"
-                  >
-                    Iniciar sesión
-                  </a>
                 </div>
               )}
             </Panel>
@@ -943,47 +941,8 @@ export default function Dashboard() {
                             <Badge variant="secondary">Tipado estricto</Badge>
                           }
                         >
-                          <p className="mb-4 text-sm text-muted-foreground">
-                            Selecciona las secciones que estarán disponibles
-                            para reglas y variables. Edita la estructura y los
-                            joins en la pestaña DSL.
-                          </p>
-                          {Object.entries(
-                            defaults!.inputs.output_schema.fields,
-                          ).map(([key, rawType]) => (
-                            <label
-                              className="catalog-row cursor-pointer"
-                              key={key}
-                            >
-                              <Checkbox
-                                disabled={!canInput}
-                                checked={key in inputs.output_schema.fields}
-                                onCheckedChange={(checked) => {
-                                  const d = copy(inputs);
-                                  if (checked) {
-                                    d.output_schema.fields[key] = copy(rawType);
-                                    d.mappings[key] = copy(
-                                      defaults!.inputs.mappings[key],
-                                    );
-                                  } else {
-                                    delete d.output_schema.fields[key];
-                                    delete d.mappings[key];
-                                  }
-                                  changeInput(d);
-                                }}
-                              />
-                              <div>
-                                <strong>{key}</strong>
-                                <p className="text-sm text-muted-foreground">
-                                  {(rawType as Doc).type === 'array'
-                                    ? 'Relación 1:N · lista de objetos'
-                                    : (rawType as Doc).type === 'struct'
-                                      ? 'Relación 1:1 · objeto'
-                                      : 'Campo del cliente'}
-                                </p>
-                              </div>
-                            </label>
-                          ))}
+                          <InputFieldSelector inputs={inputs} template={defaults!.inputCatalog}
+                            disabled={!canInput || !!busy} onChange={changeInput} onError={setError} />
                         </Panel>
                         <Panel title="Estructura disponible">
                           <Fields schema={inputs.output_schema} />

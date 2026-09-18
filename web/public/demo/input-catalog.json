@@ -1,0 +1,1458 @@
+{
+  "kind": "consolidated_inputs",
+  "dsl_version": "0.1",
+  "definition_id": "banking_inputs",
+  "definition_version": 1,
+  "created_by": "synthetic-author",
+  "created_at": "2026-09-09T00:00:00Z",
+  "root": {
+    "source": "c",
+    "client_key": "client_id"
+  },
+  "sources": [
+    {
+      "id": "c",
+      "table_ref": "clients",
+      "fields": {
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "type": "string",
+          "nullable": false
+        },
+        "age": {
+          "type": "integer",
+          "nullable": false
+        },
+        "spouse_id": {
+          "type": "string",
+          "nullable": true
+        },
+        "email": {
+          "type": "string",
+          "nullable": false
+        },
+        "city": {
+          "type": "string",
+          "nullable": false
+        },
+        "country": {
+          "type": "string",
+          "nullable": false
+        },
+        "segment": {
+          "type": "string",
+          "nullable": false
+        },
+        "registered_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "active": {
+          "type": "boolean",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "f",
+      "table_ref": "finances",
+      "fields": {
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "income": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "debt": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "monthly_expenses": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "assets": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "savings": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "currency": {
+          "type": "string",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "sp",
+      "table_ref": "clients",
+      "fields": {
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "name": {
+          "type": "string",
+          "nullable": false
+        },
+        "age": {
+          "type": "integer",
+          "nullable": false
+        },
+        "spouse_id": {
+          "type": "string",
+          "nullable": true
+        },
+        "email": {
+          "type": "string",
+          "nullable": false
+        },
+        "city": {
+          "type": "string",
+          "nullable": false
+        },
+        "country": {
+          "type": "string",
+          "nullable": false
+        },
+        "segment": {
+          "type": "string",
+          "nullable": false
+        },
+        "registered_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "active": {
+          "type": "boolean",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "sf",
+      "table_ref": "finances",
+      "fields": {
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "income": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "debt": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "monthly_expenses": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "assets": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "savings": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "currency": {
+          "type": "string",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "a",
+      "table_ref": "accounts",
+      "fields": {
+        "account_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "balance": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "kind": {
+          "type": "string",
+          "nullable": false
+        },
+        "currency": {
+          "type": "string",
+          "nullable": false
+        },
+        "status": {
+          "type": "string",
+          "nullable": false
+        },
+        "opened_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "overdraft_limit": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "m",
+      "table_ref": "movements",
+      "fields": {
+        "movement_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "account_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "amount": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "movement_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "channel": {
+          "type": "string",
+          "nullable": false
+        },
+        "category": {
+          "type": "string",
+          "nullable": false
+        },
+        "direction": {
+          "type": "string",
+          "nullable": false
+        },
+        "currency": {
+          "type": "string",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "l",
+      "table_ref": "loans",
+      "fields": {
+        "loan_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "outstanding": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "status": {
+          "type": "string",
+          "nullable": false
+        },
+        "installment": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "remaining_months": {
+          "type": "integer",
+          "nullable": false
+        },
+        "days_overdue": {
+          "type": "integer",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "e",
+      "table_ref": "employment",
+      "fields": {
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "company": {
+          "type": "string",
+          "nullable": false
+        },
+        "sector": {
+          "type": "string",
+          "nullable": false
+        },
+        "contract_type": {
+          "type": "string",
+          "nullable": false
+        },
+        "tenure_years": {
+          "type": "integer",
+          "nullable": false
+        },
+        "monthly_salary": {
+          "type": "decimal",
+          "precision": 18,
+          "scale": 2,
+          "nullable": false
+        },
+        "active": {
+          "type": "boolean",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "ad",
+      "table_ref": "addresses",
+      "fields": {
+        "address_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "kind": {
+          "type": "string",
+          "nullable": false
+        },
+        "city": {
+          "type": "string",
+          "nullable": false
+        },
+        "country": {
+          "type": "string",
+          "nullable": false
+        },
+        "postal_code": {
+          "type": "string",
+          "nullable": false
+        },
+        "is_primary": {
+          "type": "boolean",
+          "nullable": false
+        }
+      }
+    },
+    {
+      "id": "it",
+      "table_ref": "interactions",
+      "fields": {
+        "interaction_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "client_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "contact_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "channel": {
+          "type": "string",
+          "nullable": false
+        },
+        "category": {
+          "type": "string",
+          "nullable": false
+        },
+        "outcome": {
+          "type": "string",
+          "nullable": false
+        },
+        "satisfaction": {
+          "type": "integer",
+          "nullable": false
+        }
+      }
+    }
+  ],
+  "joins": [
+    {
+      "id": "financial",
+      "parent": "c",
+      "source": "f",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "one",
+      "order_by": [
+        "client_id"
+      ]
+    },
+    {
+      "id": "spouse",
+      "parent": "c",
+      "source": "sp",
+      "left_key": "spouse_id",
+      "right_key": "client_id",
+      "cardinality": "one",
+      "order_by": [
+        "client_id"
+      ]
+    },
+    {
+      "id": "spouse_financial",
+      "parent": "sp",
+      "source": "sf",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "one",
+      "order_by": [
+        "client_id"
+      ]
+    },
+    {
+      "id": "accounts",
+      "parent": "c",
+      "source": "a",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "many",
+      "order_by": [
+        "account_id"
+      ]
+    },
+    {
+      "id": "movements",
+      "parent": "a",
+      "source": "m",
+      "left_key": "account_id",
+      "right_key": "account_id",
+      "cardinality": "many",
+      "order_by": [
+        "movement_id"
+      ]
+    },
+    {
+      "id": "loans",
+      "parent": "c",
+      "source": "l",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "many",
+      "order_by": [
+        "loan_id"
+      ]
+    },
+    {
+      "id": "employment",
+      "parent": "c",
+      "source": "e",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "one",
+      "order_by": [
+        "client_id"
+      ]
+    },
+    {
+      "id": "addresses",
+      "parent": "c",
+      "source": "ad",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "many",
+      "order_by": [
+        "address_id"
+      ]
+    },
+    {
+      "id": "interactions",
+      "parent": "c",
+      "source": "it",
+      "left_key": "client_id",
+      "right_key": "client_id",
+      "cardinality": "many",
+      "order_by": [
+        "interaction_id"
+      ]
+    }
+  ],
+  "output_schema": {
+    "type": "struct",
+    "nullable": false,
+    "fields": {
+      "name": {
+        "type": "string",
+        "nullable": false
+      },
+      "age": {
+        "type": "integer",
+        "nullable": false
+      },
+      "financial": {
+        "type": "struct",
+        "nullable": true,
+        "fields": {
+          "income": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "debt": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "monthly_expenses": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "assets": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "savings": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "currency": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "spouse": {
+        "type": "struct",
+        "nullable": true,
+        "fields": {
+          "name": {
+            "type": "string",
+            "nullable": false
+          },
+          "financial": {
+            "type": "struct",
+            "nullable": true,
+            "fields": {
+              "income": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "client_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "debt": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "monthly_expenses": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "assets": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "savings": {
+                "type": "decimal",
+                "precision": 18,
+                "scale": 2,
+                "nullable": false
+              },
+              "currency": {
+                "type": "string",
+                "nullable": false
+              }
+            }
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "age": {
+            "type": "integer",
+            "nullable": false
+          },
+          "spouse_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": false
+          },
+          "city": {
+            "type": "string",
+            "nullable": false
+          },
+          "country": {
+            "type": "string",
+            "nullable": false
+          },
+          "segment": {
+            "type": "string",
+            "nullable": false
+          },
+          "registered_date": {
+            "type": "date",
+            "nullable": false
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": false
+          }
+        }
+      },
+      "accounts": {
+        "type": "array",
+        "nullable": false,
+        "items": {
+          "type": "struct",
+          "nullable": false,
+          "fields": {
+            "id": {
+              "type": "string",
+              "nullable": false
+            },
+            "balance": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            },
+            "kind": {
+              "type": "string",
+              "nullable": false
+            },
+            "movements": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "struct",
+                "nullable": false,
+                "fields": {
+                  "id": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "amount": {
+                    "type": "decimal",
+                    "precision": 18,
+                    "scale": 2,
+                    "nullable": false
+                  },
+                  "date": {
+                    "type": "date",
+                    "nullable": false
+                  },
+                  "account_id": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "channel": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "category": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "direction": {
+                    "type": "string",
+                    "nullable": false
+                  },
+                  "currency": {
+                    "type": "string",
+                    "nullable": false
+                  }
+                }
+              }
+            },
+            "client_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "currency": {
+              "type": "string",
+              "nullable": false
+            },
+            "status": {
+              "type": "string",
+              "nullable": false
+            },
+            "opened_date": {
+              "type": "date",
+              "nullable": false
+            },
+            "overdraft_limit": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            }
+          }
+        }
+      },
+      "loans": {
+        "type": "array",
+        "nullable": false,
+        "items": {
+          "type": "struct",
+          "nullable": false,
+          "fields": {
+            "id": {
+              "type": "string",
+              "nullable": false
+            },
+            "outstanding": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            },
+            "client_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "status": {
+              "type": "string",
+              "nullable": false
+            },
+            "installment": {
+              "type": "decimal",
+              "precision": 18,
+              "scale": 2,
+              "nullable": false
+            },
+            "remaining_months": {
+              "type": "integer",
+              "nullable": false
+            },
+            "days_overdue": {
+              "type": "integer",
+              "nullable": false
+            }
+          }
+        }
+      },
+      "employment": {
+        "type": "struct",
+        "nullable": true,
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "company": {
+            "type": "string",
+            "nullable": false
+          },
+          "sector": {
+            "type": "string",
+            "nullable": false
+          },
+          "contract_type": {
+            "type": "string",
+            "nullable": false
+          },
+          "tenure_years": {
+            "type": "integer",
+            "nullable": false
+          },
+          "monthly_salary": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": false
+          }
+        }
+      },
+      "addresses": {
+        "type": "array",
+        "nullable": false,
+        "items": {
+          "type": "struct",
+          "nullable": false,
+          "fields": {
+            "address_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "client_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "kind": {
+              "type": "string",
+              "nullable": false
+            },
+            "city": {
+              "type": "string",
+              "nullable": false
+            },
+            "country": {
+              "type": "string",
+              "nullable": false
+            },
+            "postal_code": {
+              "type": "string",
+              "nullable": false
+            },
+            "is_primary": {
+              "type": "boolean",
+              "nullable": false
+            }
+          }
+        }
+      },
+      "interactions": {
+        "type": "array",
+        "nullable": false,
+        "items": {
+          "type": "struct",
+          "nullable": false,
+          "fields": {
+            "interaction_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "client_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "contact_date": {
+              "type": "date",
+              "nullable": false
+            },
+            "channel": {
+              "type": "string",
+              "nullable": false
+            },
+            "category": {
+              "type": "string",
+              "nullable": false
+            },
+            "outcome": {
+              "type": "string",
+              "nullable": false
+            },
+            "satisfaction": {
+              "type": "integer",
+              "nullable": false
+            }
+          }
+        }
+      },
+      "client_id": {
+        "type": "string",
+        "nullable": false
+      },
+      "spouse_id": {
+        "type": "string",
+        "nullable": true
+      },
+      "email": {
+        "type": "string",
+        "nullable": false
+      },
+      "city": {
+        "type": "string",
+        "nullable": false
+      },
+      "country": {
+        "type": "string",
+        "nullable": false
+      },
+      "segment": {
+        "type": "string",
+        "nullable": false
+      },
+      "registered_date": {
+        "type": "date",
+        "nullable": false
+      },
+      "active": {
+        "type": "boolean",
+        "nullable": false
+      }
+    }
+  },
+  "mappings": {
+    "name": {
+      "ref": {
+        "source": "c",
+        "field": "name"
+      }
+    },
+    "age": {
+      "ref": {
+        "source": "c",
+        "field": "age"
+      }
+    },
+    "financial": {
+      "join": "financial",
+      "object": {
+        "income": {
+          "ref": {
+            "source": "f",
+            "field": "income"
+          }
+        },
+        "debt": {
+          "ref": {
+            "source": "f",
+            "field": "debt"
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "f",
+            "field": "client_id"
+          }
+        },
+        "monthly_expenses": {
+          "ref": {
+            "source": "f",
+            "field": "monthly_expenses"
+          }
+        },
+        "assets": {
+          "ref": {
+            "source": "f",
+            "field": "assets"
+          }
+        },
+        "savings": {
+          "ref": {
+            "source": "f",
+            "field": "savings"
+          }
+        },
+        "currency": {
+          "ref": {
+            "source": "f",
+            "field": "currency"
+          }
+        }
+      }
+    },
+    "spouse": {
+      "join": "spouse",
+      "object": {
+        "name": {
+          "ref": {
+            "source": "sp",
+            "field": "name"
+          }
+        },
+        "financial": {
+          "join": "spouse_financial",
+          "object": {
+            "income": {
+              "ref": {
+                "source": "sf",
+                "field": "income"
+              }
+            },
+            "client_id": {
+              "ref": {
+                "source": "sf",
+                "field": "client_id"
+              }
+            },
+            "debt": {
+              "ref": {
+                "source": "sf",
+                "field": "debt"
+              }
+            },
+            "monthly_expenses": {
+              "ref": {
+                "source": "sf",
+                "field": "monthly_expenses"
+              }
+            },
+            "assets": {
+              "ref": {
+                "source": "sf",
+                "field": "assets"
+              }
+            },
+            "savings": {
+              "ref": {
+                "source": "sf",
+                "field": "savings"
+              }
+            },
+            "currency": {
+              "ref": {
+                "source": "sf",
+                "field": "currency"
+              }
+            }
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "sp",
+            "field": "client_id"
+          }
+        },
+        "age": {
+          "ref": {
+            "source": "sp",
+            "field": "age"
+          }
+        },
+        "spouse_id": {
+          "ref": {
+            "source": "sp",
+            "field": "spouse_id"
+          }
+        },
+        "email": {
+          "ref": {
+            "source": "sp",
+            "field": "email"
+          }
+        },
+        "city": {
+          "ref": {
+            "source": "sp",
+            "field": "city"
+          }
+        },
+        "country": {
+          "ref": {
+            "source": "sp",
+            "field": "country"
+          }
+        },
+        "segment": {
+          "ref": {
+            "source": "sp",
+            "field": "segment"
+          }
+        },
+        "registered_date": {
+          "ref": {
+            "source": "sp",
+            "field": "registered_date"
+          }
+        },
+        "active": {
+          "ref": {
+            "source": "sp",
+            "field": "active"
+          }
+        }
+      }
+    },
+    "accounts": {
+      "join": "accounts",
+      "array": {
+        "id": {
+          "ref": {
+            "source": "a",
+            "field": "account_id"
+          }
+        },
+        "balance": {
+          "ref": {
+            "source": "a",
+            "field": "balance"
+          }
+        },
+        "kind": {
+          "ref": {
+            "source": "a",
+            "field": "kind"
+          }
+        },
+        "movements": {
+          "join": "movements",
+          "array": {
+            "id": {
+              "ref": {
+                "source": "m",
+                "field": "movement_id"
+              }
+            },
+            "amount": {
+              "ref": {
+                "source": "m",
+                "field": "amount"
+              }
+            },
+            "date": {
+              "ref": {
+                "source": "m",
+                "field": "movement_date"
+              }
+            },
+            "account_id": {
+              "ref": {
+                "source": "m",
+                "field": "account_id"
+              }
+            },
+            "channel": {
+              "ref": {
+                "source": "m",
+                "field": "channel"
+              }
+            },
+            "category": {
+              "ref": {
+                "source": "m",
+                "field": "category"
+              }
+            },
+            "direction": {
+              "ref": {
+                "source": "m",
+                "field": "direction"
+              }
+            },
+            "currency": {
+              "ref": {
+                "source": "m",
+                "field": "currency"
+              }
+            }
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "a",
+            "field": "client_id"
+          }
+        },
+        "currency": {
+          "ref": {
+            "source": "a",
+            "field": "currency"
+          }
+        },
+        "status": {
+          "ref": {
+            "source": "a",
+            "field": "status"
+          }
+        },
+        "opened_date": {
+          "ref": {
+            "source": "a",
+            "field": "opened_date"
+          }
+        },
+        "overdraft_limit": {
+          "ref": {
+            "source": "a",
+            "field": "overdraft_limit"
+          }
+        }
+      }
+    },
+    "loans": {
+      "join": "loans",
+      "array": {
+        "id": {
+          "ref": {
+            "source": "l",
+            "field": "loan_id"
+          }
+        },
+        "outstanding": {
+          "ref": {
+            "source": "l",
+            "field": "outstanding"
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "l",
+            "field": "client_id"
+          }
+        },
+        "status": {
+          "ref": {
+            "source": "l",
+            "field": "status"
+          }
+        },
+        "installment": {
+          "ref": {
+            "source": "l",
+            "field": "installment"
+          }
+        },
+        "remaining_months": {
+          "ref": {
+            "source": "l",
+            "field": "remaining_months"
+          }
+        },
+        "days_overdue": {
+          "ref": {
+            "source": "l",
+            "field": "days_overdue"
+          }
+        }
+      }
+    },
+    "employment": {
+      "join": "employment",
+      "object": {
+        "client_id": {
+          "ref": {
+            "source": "e",
+            "field": "client_id"
+          }
+        },
+        "company": {
+          "ref": {
+            "source": "e",
+            "field": "company"
+          }
+        },
+        "sector": {
+          "ref": {
+            "source": "e",
+            "field": "sector"
+          }
+        },
+        "contract_type": {
+          "ref": {
+            "source": "e",
+            "field": "contract_type"
+          }
+        },
+        "tenure_years": {
+          "ref": {
+            "source": "e",
+            "field": "tenure_years"
+          }
+        },
+        "monthly_salary": {
+          "ref": {
+            "source": "e",
+            "field": "monthly_salary"
+          }
+        },
+        "active": {
+          "ref": {
+            "source": "e",
+            "field": "active"
+          }
+        }
+      }
+    },
+    "addresses": {
+      "join": "addresses",
+      "array": {
+        "address_id": {
+          "ref": {
+            "source": "ad",
+            "field": "address_id"
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "ad",
+            "field": "client_id"
+          }
+        },
+        "kind": {
+          "ref": {
+            "source": "ad",
+            "field": "kind"
+          }
+        },
+        "city": {
+          "ref": {
+            "source": "ad",
+            "field": "city"
+          }
+        },
+        "country": {
+          "ref": {
+            "source": "ad",
+            "field": "country"
+          }
+        },
+        "postal_code": {
+          "ref": {
+            "source": "ad",
+            "field": "postal_code"
+          }
+        },
+        "is_primary": {
+          "ref": {
+            "source": "ad",
+            "field": "is_primary"
+          }
+        }
+      }
+    },
+    "interactions": {
+      "join": "interactions",
+      "array": {
+        "interaction_id": {
+          "ref": {
+            "source": "it",
+            "field": "interaction_id"
+          }
+        },
+        "client_id": {
+          "ref": {
+            "source": "it",
+            "field": "client_id"
+          }
+        },
+        "contact_date": {
+          "ref": {
+            "source": "it",
+            "field": "contact_date"
+          }
+        },
+        "channel": {
+          "ref": {
+            "source": "it",
+            "field": "channel"
+          }
+        },
+        "category": {
+          "ref": {
+            "source": "it",
+            "field": "category"
+          }
+        },
+        "outcome": {
+          "ref": {
+            "source": "it",
+            "field": "outcome"
+          }
+        },
+        "satisfaction": {
+          "ref": {
+            "source": "it",
+            "field": "satisfaction"
+          }
+        }
+      }
+    },
+    "client_id": {
+      "ref": {
+        "source": "c",
+        "field": "client_id"
+      }
+    },
+    "spouse_id": {
+      "ref": {
+        "source": "c",
+        "field": "spouse_id"
+      }
+    },
+    "email": {
+      "ref": {
+        "source": "c",
+        "field": "email"
+      }
+    },
+    "city": {
+      "ref": {
+        "source": "c",
+        "field": "city"
+      }
+    },
+    "country": {
+      "ref": {
+        "source": "c",
+        "field": "country"
+      }
+    },
+    "segment": {
+      "ref": {
+        "source": "c",
+        "field": "segment"
+      }
+    },
+    "registered_date": {
+      "ref": {
+        "source": "c",
+        "field": "registered_date"
+      }
+    },
+    "active": {
+      "ref": {
+        "source": "c",
+        "field": "active"
+      }
+    }
+  }
+}

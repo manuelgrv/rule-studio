@@ -30,6 +30,30 @@
           "spouse_id": {
             "type": "string",
             "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": false
+          },
+          "city": {
+            "type": "string",
+            "nullable": false
+          },
+          "country": {
+            "type": "string",
+            "nullable": false
+          },
+          "segment": {
+            "type": "string",
+            "nullable": false
+          },
+          "registered_date": {
+            "type": "date",
+            "nullable": false
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": false
           }
         }
       },
@@ -51,6 +75,28 @@
             "type": "decimal",
             "precision": 18,
             "scale": 2,
+            "nullable": false
+          },
+          "monthly_expenses": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "assets": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "savings": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "currency": {
+            "type": "string",
             "nullable": false
           }
         }
@@ -74,6 +120,30 @@
           "spouse_id": {
             "type": "string",
             "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": false
+          },
+          "city": {
+            "type": "string",
+            "nullable": false
+          },
+          "country": {
+            "type": "string",
+            "nullable": false
+          },
+          "segment": {
+            "type": "string",
+            "nullable": false
+          },
+          "registered_date": {
+            "type": "date",
+            "nullable": false
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": false
           }
         }
       },
@@ -95,6 +165,28 @@
             "type": "decimal",
             "precision": 18,
             "scale": 2,
+            "nullable": false
+          },
+          "monthly_expenses": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "assets": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "savings": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "currency": {
+            "type": "string",
             "nullable": false
           }
         }
@@ -120,6 +212,24 @@
           "kind": {
             "type": "string",
             "nullable": false
+          },
+          "currency": {
+            "type": "string",
+            "nullable": false
+          },
+          "status": {
+            "type": "string",
+            "nullable": false
+          },
+          "opened_date": {
+            "type": "date",
+            "nullable": false
+          },
+          "overdraft_limit": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
           }
         }
       },
@@ -144,6 +254,22 @@
           "movement_date": {
             "type": "date",
             "nullable": false
+          },
+          "channel": {
+            "type": "string",
+            "nullable": false
+          },
+          "category": {
+            "type": "string",
+            "nullable": false
+          },
+          "direction": {
+            "type": "string",
+            "nullable": false
+          },
+          "currency": {
+            "type": "string",
+            "nullable": false
           }
         }
       },
@@ -163,6 +289,128 @@
             "type": "decimal",
             "precision": 18,
             "scale": 2,
+            "nullable": false
+          },
+          "status": {
+            "type": "string",
+            "nullable": false
+          },
+          "installment": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "remaining_months": {
+            "type": "integer",
+            "nullable": false
+          },
+          "days_overdue": {
+            "type": "integer",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "e",
+        "table_ref": "employment",
+        "fields": {
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "company": {
+            "type": "string",
+            "nullable": false
+          },
+          "sector": {
+            "type": "string",
+            "nullable": false
+          },
+          "contract_type": {
+            "type": "string",
+            "nullable": false
+          },
+          "tenure_years": {
+            "type": "integer",
+            "nullable": false
+          },
+          "monthly_salary": {
+            "type": "decimal",
+            "precision": 18,
+            "scale": 2,
+            "nullable": false
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "ad",
+        "table_ref": "addresses",
+        "fields": {
+          "address_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "kind": {
+            "type": "string",
+            "nullable": false
+          },
+          "city": {
+            "type": "string",
+            "nullable": false
+          },
+          "country": {
+            "type": "string",
+            "nullable": false
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": false
+          },
+          "is_primary": {
+            "type": "boolean",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "id": "it",
+        "table_ref": "interactions",
+        "fields": {
+          "interaction_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "client_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "contact_date": {
+            "type": "date",
+            "nullable": false
+          },
+          "channel": {
+            "type": "string",
+            "nullable": false
+          },
+          "category": {
+            "type": "string",
+            "nullable": false
+          },
+          "outcome": {
+            "type": "string",
+            "nullable": false
+          },
+          "satisfaction": {
+            "type": "integer",
             "nullable": false
           }
         }
@@ -233,6 +481,39 @@
         "cardinality": "many",
         "order_by": [
           "loan_id"
+        ]
+      },
+      {
+        "id": "employment",
+        "parent": "c",
+        "source": "e",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "one",
+        "order_by": [
+          "client_id"
+        ]
+      },
+      {
+        "id": "addresses",
+        "parent": "c",
+        "source": "ad",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "many",
+        "order_by": [
+          "address_id"
+        ]
+      },
+      {
+        "id": "interactions",
+        "parent": "c",
+        "source": "it",
+        "left_key": "client_id",
+        "right_key": "client_id",
+        "cardinality": "many",
+        "order_by": [
+          "interaction_id"
         ]
       }
     ],

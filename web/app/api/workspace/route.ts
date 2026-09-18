@@ -1,37 +1,38 @@
 import { env } from 'cloudflare:workers';
-import { getChatGPTUser } from '@/app/chatgpt-auth';
+import { workspaceToken, newWorkspaceToken, workspaceOwner, workspaceCookie } from '@/lib/anonymous-workspace';
 import { transition } from '@/lib/workflow';
 import defaults from '@/public/demo/defaults.json';
 export const dynamic = 'force-dynamic';
-async function identity() {
-  const user = await getChatGPTUser();
-  if (!user) throw new Error('AUTH');
-  return user.userId;
-}
 const reply = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const owner = await identity();
+    const previousToken = workspaceToken(request);
+    const token = previousToken ?? newWorkspaceToken();
+    const owner = await workspaceOwner(token);
     const row = await env.DB.prepare(
       'SELECT revision,state FROM workspaces WHERE owner = ?',
     )
       .bind(owner)
       .first<{ revision: number; state: string }>();
-    return reply(
+    const response = reply(
       row
         ? { revision: row.revision, state: JSON.parse(row.state) }
         : { revision: 0, state: null },
     );
+    if (!previousToken) response.headers.set('Set-Cookie', workspaceCookie(token, request));
+    return response;
   } catch (e) {
-    return reply({ error: String(e) }, String(e).includes('AUTH') ? 401 : 500);
+    return reply({ error: 'No se pudo abrir el espacio. Inténtalo de nuevo.' }, 500);
   }
 }
 export async function POST(request: Request) {
   try {
-    const owner = await identity();
     if (request.headers.get('origin') !== new URL(request.url).origin)
       return reply({ error: 'Origen no autorizado' }, 403);
+    const token = workspaceToken(request);
+    if (!token) return reply({ error: 'Recarga la página y permite las cookies de este sitio para conservar tu espacio.' }, 400);
+    const owner = await workspaceOwner(token);
     const text = await request.text();
     if (text.length > 750000)
       return reply({ error: 'Documento demasiado grande' }, 413);
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
   } catch (e) {
     return reply(
       { error: e instanceof Error ? e.message : String(e) },
-      String(e).includes('AUTH') ? 401 : 400,
+      400,
     );
   }
 }

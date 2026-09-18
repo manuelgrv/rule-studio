@@ -1,4 +1,5 @@
 import type { AsyncDuckDB, AsyncDuckDBConnection } from '@duckdb/duckdb-wasm';
+import sourceTables from './source-tables.json';
 export type Doc = Record<string, any>;
 let compiler: Worker | undefined;
 let serial = 0;
@@ -53,7 +54,7 @@ export function compile(payload: Doc): Promise<any> {
 let database:
   | Promise<{ db: AsyncDuckDB; con: AsyncDuckDBConnection }>
   | undefined;
-export const tables = ['clients', 'finances', 'accounts', 'movements', 'loans'];
+export const tables: string[] = sourceTables;
 export async function getDatabase() {
   return (database ||= (async () => {
     const duckdb = await import('@duckdb/duckdb-wasm');

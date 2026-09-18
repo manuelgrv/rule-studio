@@ -9,16 +9,27 @@ const dist=new URL('../node_modules/@duckdb/duckdb-wasm/dist/',import.meta.url).
 const db=await duck.createDuckDB({mvp:{mainModule:dist+'duckdb-mvp.wasm'},eh:{mainModule:dist+'duckdb-eh.wasm'}},new duck.VoidLogger(),duck.NODE_RUNTIME);
 await db.instantiate();
 const con=db.connect();
-for(const t of ['clients','finances','accounts','movements','loans']){db.registerFileBuffer(t+'.parquet',readFileSync(new URL(`../public/demo/${t}.parquet`,import.meta.url)));con.query(`CREATE TABLE ${t} AS SELECT * FROM '${t}.parquet'`)}
-console.log('DuckDB-WASM: five source tables loaded.');
+const defaults=JSON.parse(readFileSync(new URL('../public/demo/defaults.json',import.meta.url),'utf8'));
+for(const t of new Set(defaults.inputs.sources.map(s=>s.table_ref))){db.registerFileBuffer(t+'.parquet',readFileSync(new URL(`../public/demo/${t}.parquet`,import.meta.url)));con.query(`CREATE TABLE ${t} AS SELECT * FROM '${t}.parquet'`)}
+console.log('DuckDB-WASM: eight source tables loaded.');
 const py=await loadPyodide({packageBaseUrl:'https://cdn.jsdelivr.net/pyodide/v0.29.3/full/'});
 await py.loadPackage(['micropip','jsonschema']);
 await py.runPythonAsync('import micropip\nawait micropip.install("sqlglot==30.18.0")');
 py.unpackArchive(new Uint8Array(readFileSync(new URL('../public/demo/rule_manager.zip',import.meta.url))),'zip');
 py.runPython(readFileSync(new URL('../python/bridge.py',import.meta.url),'utf8'));
-const defaults=JSON.parse(readFileSync(new URL('../public/demo/defaults.json',import.meta.url),'utf8'));
+
 const fn=py.globals.get('call');
 const call=(action,extra={})=>{const r=JSON.parse(fn(JSON.stringify({...defaults,catalog:defaults.inputs.sources,action,...extra})));if(!r.ok)throw new Error(JSON.stringify(r.error));return r.result};
+const fullCatalog=JSON.parse(readFileSync(new URL('../public/demo/input-catalog.json',import.meta.url),'utf8'));
+const expanded=call('inputs',{inputs:fullCatalog});
+con.query(`CREATE TABLE extended_input AS ${expanded.sql}`);
+const example=JSON.parse(con.query("SELECT CAST(to_json(fields) AS VARCHAR) AS row FROM extended_input WHERE client = 'C000002'").toArray()[0].row);
+assert.equal(example.addresses.length,2);
+assert.equal(example.interactions.length,2);
+assert.equal(example.employment.sector,'Servicios');
+assert.equal(example.accounts[0].movements.length,3);
+assert.ok(example.email.endsWith('@example.test'));
+console.log('PASS: extended catalog compiles and materializes fields, 1:1 objects and nested 1:N lists.');
 const plan=call('validate');
 con.query(`CREATE TABLE consolidated_input AS ${plan.sql}`);
 assert.equal(Number(con.query('SELECT count(*) n FROM consolidated_input').toArray()[0].n),30000);

@@ -2,7 +2,7 @@
 
 **Demo online:** [Abrir Rule Studio](https://inhouse-rule-manager-demo.manuelrodval.chatgpt.site/)
 
-El sitio es público: cualquier persona con el enlace puede acceder. Para utilizar un espacio de trabajo y guardar ediciones, la aplicación solicita iniciar sesión con ChatGPT.
+El sitio es público y se usa sin cuentas ni inicio de sesión. Cada navegador recibe un espacio anónimo independiente. Una cookie conserva el acceso a sus ediciones; al borrarla o cambiar de navegador se abre un espacio nuevo.
 
 Rule Studio es un entorno para definir datos de entrada, construir variables reutilizables y crear reglas de evaluación mediante herramientas visuales, Python y SQL. La lógica se expresa en DSL JSON tipadas que pueden validarse, versionarse e interpretarse fuera de la interfaz.
 
@@ -16,7 +16,7 @@ El repositorio incluye una aplicación web, una biblioteca Python y notebooks co
 
 | Módulo | Funcionalidad |
 | --- | --- |
-| Selección de inputs | Catálogo de fuentes y campos, selección de secciones del consolidado, esquema tipado y configuración JSON de relaciones encadenadas 1:1 y 1:N. |
+| Selección de inputs | Catálogo de fuentes y campos, selección individual de campos por tabla con búsqueda por nombre y ruta, esquema tipado y configuración JSON de relaciones encadenadas 1:1 y 1:N. |
 | Variables virtuales | Expresiones aritméticas, agregaciones sobre arrays, dependencias entre variables, inferencia de tipos y catálogo de cálculos reutilizables. |
 | Estudio de reglas | Autoría visual, Python y SQL restringidos; reglas booleanas y composición de productos con operadores lógicos. |
 | Aprobaciones | Borradores, propuestas, rechazo con motivo, publicación automática tras aprobación e historial de versiones. |
@@ -45,7 +45,7 @@ flowchart LR
 
 - **Biblioteca compartida:** Pyodide carga el código Python existente para compilar e interpretar las DSL. El editor visual produce expresiones para esa misma biblioteca.
 - **Procesamiento en el navegador:** DuckDB-WASM consolida las fuentes sintéticas. Los resultados de los experimentos son temporales y pueden exportarse como JSON.
-- **Persistencia del sitio:** D1 guarda el espacio de cada identidad ChatGPT, con control de revisiones para evitar sobrescrituras concurrentes.
+- **Persistencia del sitio:** D1 guarda el espacio de cada visitante anónimo, identificado por una cookie propia del sitio, con control de revisiones para evitar sobrescrituras concurrentes.
 - **Ejecución local alternativa:** la biblioteca también funciona con Python y DuckDB nativos desde scripts y notebooks, sin requerir Sites.
 
 Los diseños de integración con Databricks Apps, Lakehouse, Lakebase y Artifactory se conservan en [docs/](docs/README.md). Describen el destino previsto; la demo no requiere esos servicios.
@@ -111,7 +111,7 @@ npx wrangler d1 migrations apply DB --local --config wrangler.local.json
 npm run dev
 ~~~
 
-Abre la URL que indique el servidor y utiliza el enlace de inicio de sesión local. El plugin de Sites proporciona una identidad de prueba para desarrollo; el sitio alojado utiliza la identidad de ChatGPT.
+Abre la URL que indique el servidor. El espacio se inicializa automáticamente sin iniciar sesión, igual que en el sitio público. Debes permitir las cookies propias del sitio para conservar el acceso a tus ediciones.
 
 ### Recorrido sugerido
 
@@ -233,7 +233,7 @@ docs/c4/            Vistas de arquitectura LikeC4
 - La validación semántica ocurre en el navegador. Una publicación productiva necesita validación independiente en un entorno confiable y permisos asociados a identidades reales.
 - Los borradores e historial se conservan en D1; las tablas y los resultados del laboratorio se regeneran al recargar el navegador.
 - Python y SQL son subconjuntos restringidos. No se admiten imports, librerías de usuario ni ejecución arbitraria de código fuente. PySpark y pandas no forman parte del lenguaje de autoría del MVP.
-- El selector visual de inputs trabaja con secciones del ejemplo; la configuración detallada de nodos y joins se realiza mediante el editor JSON.
+- El selector visual ofrece 78 rutas de campos sobre ocho tablas sintéticas, incluidos objetos y listas anidadas. Las relaciones personalizadas se configuran en el editor JSON. El menú lateral puede contraerse a iconos y conserva la preferencia en este navegador.
 - Los cambios incompatibles de inputs con productos vigentes requieren una migración coordinada, todavía pendiente.
 - La demo no es un motor distribuido ni una validación de capacidad para 30 millones de clientes. Las integraciones productivas previstas no están implementadas.
 
